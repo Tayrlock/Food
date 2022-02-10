@@ -98,6 +98,7 @@ window.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('hide')
         // modal.classList.toggle('show')
         document.body.style.overflow = 'hidden'
+        clearInterval(modalTimerId)
     }
 
     function closeModal() {
@@ -118,11 +119,22 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 
     document.addEventListener('keydown', (e) => {
-        if (e.code === 'Escape' && modal.classList.contains('show')){
+        if (e.code === 'Escape' && modal.classList.contains('show')) {
             closeModal()
         }
     })
 
+    // add showTimer to Modal
+    const modalTimerId = setTimeout(showModal, 5000)
+
+    function showModalByScroll(){
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+            showModal()
+            window.removeEventListener('scroll', showModalByScroll)
+        }
+    }
+
+    window.addEventListener('scroll', showModalByScroll)
 
     console.log(modalTrigger)
     console.log(modal)
