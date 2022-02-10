@@ -91,8 +91,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //Modal
     const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        modalCloseBtn = document.querySelector('[data-close]')
+        modal = document.querySelector('.modal')
+
+    // add showTimer to Modal
+    const modalTimerId = setTimeout(showModal, 500000)
+
+    function showModalByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+            showModal()
+            window.removeEventListener('scroll', showModalByScroll)
+        }
+    }
 
     function showModal() {
         modal.classList.add('show')
@@ -111,10 +120,10 @@ window.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', showModal)
     })
 
-    modalCloseBtn.addEventListener('click', closeModal)
+
 
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
+        if (e.target === modal || e.target.getAttribute('data-close') == '') {
             closeModal()
         }
     })
@@ -125,17 +134,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     })
 
-    // add showTimer to Modal
-    // const modalTimerId = setTimeout(showModal, 5000)
-
-    // function showModalByScroll(){
-    //     if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
-    //         showModal()
-    //         window.removeEventListener('scroll', showModalByScroll)
-    //     }
-    // }
-
-    // window.addEventListener('scroll', showModalByScroll)
+    window.addEventListener('scroll', showModalByScroll)
 
 
     // confige Menu
@@ -159,7 +158,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         render() {
             const div = document.createElement('div')
-            if (this.classes.length === 0){
+            if (this.classes.length === 0) {
                 this.div = 'menu__item'
                 div.classList.add()
             }
@@ -175,10 +174,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     `
 
             this.parentSelector.append(div)
-            console.log(div)
-
+            //console.log(div)
         }
-
     }
 
     // const menuFitnes = 
@@ -191,4 +188,133 @@ window.addEventListener('DOMContentLoaded', () => {
     new Menu('img/tabs/post.jpg', 'post', 'Меню "Постное"', 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', '430', '.menu .container', "menu__item")
     // .render()
 
+
+    // запросы к серверу
+    // Forms
+
+    const forms = document.querySelectorAll('form')
+    const message = {
+        loading: 'img/form/spinner.svg',
+        sucsess: 'Скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так'
+    }
+
+    forms.forEach(item => {
+        postData(item)
+    })
+
+    // XML запрос
+    // function postData(form) {
+    //     form.addEventListener('submit', (e) => {
+    //         e.preventDefault()
+    //         const statusMessage = document.createElement('div')
+    //         statusMessage.classList.add('status')
+    //         statusMessage.textContent = message.loading
+    //         form.append(statusMessage)
+
+    //         const requset = new XMLHttpRequest()
+    //         requset.open('POST', 'server.php')
+    //         // requset.setRequestHeader('Content-type', 'multipart/form-data') заголовок не устанавливается при FormData
+    //         const formData = new FormData(form)
+    //         requset.send(formData)
+    //         requset.addEventListener('load', () => {
+    //             if (requset.status === 200) {
+    //                 console.log(requset.response)
+    //                 statusMessage.textContent = message.sucsess;
+    //                 form.reset()
+    //                 setTimeout(()=>{
+    //                     statusMessage.remove()
+    //                 }, 3000)
+    //             } else {
+    //                 statusMessage.textContent = message.failure;
+    //             }
+    //         })
+    //     })
+    // }
+
+    // JSON запрос
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            const statusMessage = document.createElement('img')
+            statusMessage.src = message.loading
+            statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
+            `
+            form.insertAdjacentElement('afterend', statusMessage)
+
+            // const requset = new XMLHttpRequest()
+            // requset.open('POST', 'server.php')
+            // requset.setRequestHeader('Content-type', 'application/json')
+
+            const formData = new FormData(form)
+            // превращаем FormData в объект для JSON
+            const obj = {}
+            formData.forEach(function (value, key) {
+                obj[key] = value
+            })
+            // requset.send(json)
+
+            fetch('server1.php', {
+                method: 'POST',
+                headers: { 'Content-type': 'application/json' },
+                body: JSON.stringify(obj)
+            }).then((data => data.text()))
+                .then(data => {
+                    console.log(data)
+                    showThanksModal(message.sucsess)
+                    statusMessage.remove()
+                }).catch(() => {
+                    showThanksModal(message.failure)
+                }).finally(() => {
+                    form.reset()
+                })
+
+            // requset.addEventListener('load', () => {
+            //     if (requset.status === 200) {
+            //         console.log(requset.response)
+            //         showThanksModal(message.sucsess)
+            //         form.reset()
+            //         statusMessage.remove()
+            //     } else {
+            //         showThanksModal(message.failure)
+            //     }
+            // })
+        })
+    }
+
+    function showThanksModal(message) {
+        const prevModalDialog = document.querySelector('.modal__dialog')
+
+        prevModalDialog.classList.add('hide')
+        showModal()
+
+        const thanksModal = document.createElement('div')
+        thanksModal.classList.add('modal__dialog')
+        thanksModal.innerHTML = `
+        <div class = "modal__content">
+            <div data-close class="modal__close">&times;</div>
+            <div class="modal__title">${message}</div>
+        </div>
+        `
+        document.querySelector('.modal').append(thanksModal)
+        setTimeout(() => {
+            thanksModal.remove()
+            prevModalDialog.classList.add('show')
+            prevModalDialog.classList.remove('hide')
+            closeModal();
+        }, 4000)
+    }
+
+    // Fetch API
+    // fetch('https://jsonplaceholder.typicode.com/posts', {
+    //     method: 'POST',
+    //     body: JSON.stringify({name: 'Alex'}),
+    //     headers: {
+    //         'Content-type':'application/json'
+    //     }
+    // })
+    //     .then(response => response.json())
+    //     .then(json => console.log(json))
 })
