@@ -1,4 +1,4 @@
-// 'use strick'
+// 'use strict'
 window.addEventListener('DOMContentLoaded', () => {
     //Tabs
     const tabs = document.querySelectorAll('.tabheader__item'),
@@ -141,7 +141,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // confige Menu
 
     class Menu {
-        constructor(img, alt, subtitle, descr, price) {
+        constructor(img, alt, subtitle, descr, price, parentSelector, ...classes) {
             this.img = img
             this.alt = alt
             this.subtitle = subtitle
@@ -149,6 +149,8 @@ window.addEventListener('DOMContentLoaded', () => {
             this.price = price
             this.img = img
             this.curse = '1.5'
+            this.classes = classes
+            this.parentSelector = document.querySelector('.menu .container')
             this.switchToUAH()
             this.render()
         }
@@ -157,26 +159,36 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         render() {
             const div = document.createElement('div')
+            if (this.classes.length === 0){
+                this.div = 'menu__item'
+                div.classList.add()
+            }
+            this.classes.forEach(className => div.classList.add(className))
             div.innerHTML = `
-            <div class="menu__item">
-                    <img src=${this.img} alt=${this.alt}>
+                                <img src=${this.img} alt=${this.alt}>
                     <h3 class="menu__item-subtitle">${this.subtitle} </h3>
                     <div class="menu__item-descr">${this.descr}</div>
                     <div class="menu__item-divider"></div>
                     <div class="menu__item-price">
                         <div class="menu__item-cost">Цена:</div>
                         <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
-                    </div>`
+                    `
 
-            document.querySelector('.menu__field .container').append(div)
+            this.parentSelector.append(div)
             console.log(div)
 
         }
 
     }
 
-    const menuFitnes = new Menu("img/tabs/vegy.jpg", "vegy", 'Меню "Фитнес"', 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', '229'),
-        menuPremium = new Menu('img/tabs/elite.jpg', 'elite', 'Меню “Премиум”', 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', '550'),
-        menuPost = new Menu('img/tabs/post.jpg', 'post', 'Меню "Постное"', 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', '430')
+    // const menuFitnes = 
+    new Menu("img/tabs/vegy.jpg", "vegy", 'Меню "Фитнес"', 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', '229', '.menu .container', "menu__item", 'big')
+    // .render()
+    // menuPremium = 
+    new Menu('img/tabs/elite.jpg', 'elite', 'Меню “Премиум”', 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', '550', '.menu .container', "menu__item")
+    // .render()
+    // menuPost = 
+    new Menu('img/tabs/post.jpg', 'post', 'Меню "Постное"', 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', '430', '.menu .container', "menu__item")
+    // .render()
 
 })
