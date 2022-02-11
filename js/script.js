@@ -256,7 +256,7 @@ window.addEventListener('DOMContentLoaded', () => {
             })
             // requset.send(json)
 
-            fetch('server1.php', {
+            fetch('server.php', {
                 method: 'POST',
                 headers: { 'Content-type': 'application/json' },
                 body: JSON.stringify(obj)
@@ -317,4 +317,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // })
     //     .then(response => response.json())
     //     .then(json => console.log(json))
+
+    fetch('http://localhost:3000/menu')
+        .then(data => data.json())
+        .then(res => console.log(res))
 })
