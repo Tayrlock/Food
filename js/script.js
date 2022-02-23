@@ -391,6 +391,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // получаем общее количество слайдеров
 
     const sliders = document.querySelectorAll('.offer__slide'),
+        slider = document.querySelector('.offer__slider'),
         countCurrent = document.querySelector('#current'),
         countTotal = document.querySelector('#total'),
         btnNextSlider = document.querySelector('.offer__slider-next'),
@@ -423,6 +424,24 @@ window.addEventListener('DOMContentLoaded', () => {
         slide.style.width = width
     })
 
+    slider.style.position = 'relative'
+
+    const indicators = document.createElement('ol'),
+        dots = []
+    indicators.classList.add('carousel-indicators')
+    slider.append(indicators)
+
+    for (let i = 0; i < sliders.length; i++) {
+        const dot = document.createElement('li')
+        dot.classList.add('dot')
+        dot.setAttribute('data-slide-to', i + 1)
+        if (i == 0) {
+            dot.style.opacity = 1
+        }
+        indicators.append(dot)
+        dots.push(dot);
+    }
+
     btnNextSlider.addEventListener('click', () => {
         if (offset == +width.slice(0, width.length - 2) * (sliders.length - 1)) {
             offset = 0
@@ -431,17 +450,19 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         slidersField.style.transform = `translateX(-${offset}px)`
 
-        if (sliderIndex == sliders.length){
+        if (sliderIndex == sliders.length) {
             sliderIndex = 1
         } else {
             sliderIndex++
         }
-
-        if (sliders.length<10){
+        if (sliders.length < 10) {
             countCurrent.textContent = `0${sliderIndex}`
         } else {
             countCurrent.textContent = sliderIndex
         }
+
+        dots.forEach(dot => dot.style.opacity = '0.5')
+        dots[sliderIndex - 1].style.opacity = 1
     })
 
     btnPrevSlider.addEventListener('click', () => {
@@ -452,23 +473,41 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         slidersField.style.transform = `translateX(-${offset}px)`
 
-        if (sliderIndex == 1){
+        if (sliderIndex == 1) {
             sliderIndex = sliders.length
         } else {
             sliderIndex--
         }
-
-        if (sliders.length<10){
+        if (sliders.length < 10) {
             countCurrent.textContent = `0${sliderIndex}`
         } else {
             countCurrent.textContent = sliderIndex
         }
+        dots.forEach(dot => dot.style.opacity = '0.5')
+        dots[sliderIndex - 1].style.opacity = 1
     })
 
+    dots.forEach(dot => {
+        dot.addEventListener(('click'), (e) => {
+            const slideTo = e.target.getAttribute('data-slide-to')
 
+            sliderIndex = slideTo
+            offset = +width.slice(0, width.length - 2) * (slideTo - 1)
+            slidersField.style.transform = `translateX(-${offset}px)`
 
+            if (sliders.length < 10) {
+                countCurrent.textContent = `0${sliderIndex}`
+            } else {
+                countCurrent.textContent = sliderIndex
+            }
+
+            dots.forEach(dot => dot.style.opacity = '0.5')
+            dots[sliderIndex - 1].style.opacity = 1
+        })
+    })
+
+    // Sliders change
     // let count = 0
-
 
     // function showSlider(i) {
     //     sliders.forEach(slider => {
