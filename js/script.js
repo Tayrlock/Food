@@ -391,47 +391,115 @@ window.addEventListener('DOMContentLoaded', () => {
     // получаем общее количество слайдеров
 
     const sliders = document.querySelectorAll('.offer__slide'),
-        countCurrent = document.getElementById('current'),
-        countTotal = document.getElementById('total'),
-        slidersWrapper = document.querySelector('.offer__sliders-wrapper'),
+        countCurrent = document.querySelector('#current'),
+        countTotal = document.querySelector('#total'),
         btnNextSlider = document.querySelector('.offer__slider-next'),
-        btnPrevSlider = document.querySelector('.offer__slider-prev')
-    let count = 0
+        btnPrevSlider = document.querySelector('.offer__slider-prev'),
+        slidersWrapper = document.querySelector('.offer__slider-wrapper'),
+        slidersField = document.querySelector('.offer__slider-inner'),
+        width = window.getComputedStyle(slidersWrapper).width
+    let offset = 0,
+        sliderIndex = 1
 
+    if (sliders.length < 10) {
+        countTotal.textContent = `0${sliders.length}`
+        countCurrent.textContent = `0${sliderIndex}`
+    } else {
+        countTotal.textContent = sliders.length
+        countCurrent.textContent = sliderIndex
 
-    function showSlider(i) {
-        sliders.forEach(slider => {
-            slider.classList.add('hide', 'fade')
-        })
-        sliders[i].classList.toggle('hide')
-        console.log(sliders)
-        countChange()
+            (count + 1 < 10)
+        countCurrent.textContent = `0${count + 1}`
+        countCurrent.textContent = (count + 1)
     }
 
-    btnNextSlider.addEventListener('click', showNextSlider)
-    function showNextSlider() {
-        (count == sliders.length - 1) ? count = 0 : count += 1
-        showSlider(count)
-        console.log(count)
-    }
+    slidersField.style.width = 100 * sliders.length + '%'
+    slidersField.style.display = 'flex'
+    slidersField.style.transition = '0.5s all'
 
-    btnPrevSlider.addEventListener('click', showPrevSlider)
-    function showPrevSlider() {
-        (count == 0) ? count = sliders.length - 1 : count -= 1
-        showSlider(count)
-        console.log(count)
-    }
+    slidersWrapper.style.overflow = 'hidden'
 
-    function countChange() {
-        (sliders.length < 10)
-            ? countTotal.textContent = '0' + sliders.length
-            : countTotal.textContent = sliders.length;
+    sliders.forEach(slide => {
+        slide.style.width = width
+    })
 
-        (count + 1 < 10)
-            ? countCurrent.textContent = '0' + (count + 1)
-            : countCurrent.textContent = (count + 1)
+    btnNextSlider.addEventListener('click', () => {
+        if (offset == +width.slice(0, width.length - 2) * (sliders.length - 1)) {
+            offset = 0
+        } else {
+            offset += +width.slice(0, width.length - 2)
+        }
+        slidersField.style.transform = `translateX(-${offset}px)`
+
+        if (sliderIndex == sliders.length){
+            sliderIndex = 1
+        } else {
+            sliderIndex++
+        }
+
+        if (sliders.length<10){
+            countCurrent.textContent = `0${sliderIndex}`
+        } else {
+            countCurrent.textContent = sliderIndex
+        }
+    })
+
+    btnPrevSlider.addEventListener('click', () => {
+        if (offset == 0) {
+            offset = +width.slice(0, width.length - 2) * (sliders.length - 1)
+        } else {
+            offset -= +width.slice(0, width.length - 2)
+        }
+        slidersField.style.transform = `translateX(-${offset}px)`
+
+        if (sliderIndex == 1){
+            sliderIndex = sliders.length
+        } else {
+            sliderIndex--
+        }
+
+        if (sliders.length<10){
+            countCurrent.textContent = `0${sliderIndex}`
+        } else {
+            countCurrent.textContent = sliderIndex
+        }
+    })
 
 
-    }
-    showSlider(count)
+
+    // let count = 0
+
+
+    // function showSlider(i) {
+    //     sliders.forEach(slider => {
+    //         slider.classList.add('hide', 'fade')
+    //     })
+    //     sliders[i].classList.toggle('hide')
+    //     // console.log(sliders)
+    //     countChange()
+    // }
+
+    // btnNextSlider.addEventListener('click', showNextSlider)
+    // function showNextSlider() {
+    //     (count == sliders.length - 1) ? count = 0 : count += 1
+    //     showSlider(count)
+    //     // console.log(count)
+    // }
+
+    // btnPrevSlider.addEventListener('click', showPrevSlider)
+    // function showPrevSlider() {
+    //     (count == 0) ? count = sliders.length - 1 : count -= 1
+    //     showSlider(count)
+    //     // console.log(count)
+    // }
+
+    // function countChange() {
+    //     (sliders.length < 10)
+    //         ? countTotal.textContent = `0${sliders.length}`
+    //         : countTotal.textContent = sliders.length;
+    //     (count + 1 < 10)
+    //         ? countCurrent.textContent = `0${count + 1}`
+    //         : countCurrent.textContent = (count + 1)
+    // }
+    // showSlider(count)
 })
