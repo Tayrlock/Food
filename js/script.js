@@ -398,20 +398,30 @@ window.addEventListener('DOMContentLoaded', () => {
         btnPrevSlider = document.querySelector('.offer__slider-prev'),
         slidersWrapper = document.querySelector('.offer__slider-wrapper'),
         slidersField = document.querySelector('.offer__slider-inner'),
-        width = window.getComputedStyle(slidersWrapper).width
+        width = window.getComputedStyle(slidersWrapper).width,
+        indicators = document.createElement('ol'),
+        dots = []
     let offset = 0,
         sliderIndex = 1
 
-    if (sliders.length < 10) {
-        countTotal.textContent = `0${sliders.length}`
-        countCurrent.textContent = `0${sliderIndex}`
-    } else {
-        countTotal.textContent = sliders.length
-        countCurrent.textContent = sliderIndex
+    function dotsShow() {
+        dots.forEach(dot => dot.style.opacity = '0.5')
+        dots[sliderIndex - 1].style.opacity = 1
+    }
 
-            (count + 1 < 10)
-        countCurrent.textContent = `0${count + 1}`
-        countCurrent.textContent = (count + 1)
+    function count(){
+        if (sliders.length < 10) {
+            countTotal.textContent = `0${sliders.length}`
+            countCurrent.textContent = `0${sliderIndex}`
+        } else {
+            countTotal.textContent = sliders.length
+            countCurrent.textContent = sliderIndex
+        }
+    }
+    count()    
+
+    function deleteNotDigits(str){
+        return +str.replace(/\D/g, '')
     }
 
     slidersField.style.width = 100 * sliders.length + '%'
@@ -426,8 +436,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     slider.style.position = 'relative'
 
-    const indicators = document.createElement('ol'),
-        dots = []
     indicators.classList.add('carousel-indicators')
     slider.append(indicators)
 
@@ -443,10 +451,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     btnNextSlider.addEventListener('click', () => {
-        if (offset == +width.slice(0, width.length - 2) * (sliders.length - 1)) {
+        if (offset == deleteNotDigits(width) * (sliders.length - 1)) {
             offset = 0
         } else {
-            offset += +width.slice(0, width.length - 2)
+            offset += deleteNotDigits(width)
         }
         slidersField.style.transform = `translateX(-${offset}px)`
 
@@ -455,21 +463,15 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             sliderIndex++
         }
-        if (sliders.length < 10) {
-            countCurrent.textContent = `0${sliderIndex}`
-        } else {
-            countCurrent.textContent = sliderIndex
-        }
-
-        dots.forEach(dot => dot.style.opacity = '0.5')
-        dots[sliderIndex - 1].style.opacity = 1
+        count()
+        dotsShow()
     })
 
     btnPrevSlider.addEventListener('click', () => {
         if (offset == 0) {
-            offset = +width.slice(0, width.length - 2) * (sliders.length - 1)
+            offset = deleteNotDigits(width) * (sliders.length - 1)
         } else {
-            offset -= +width.slice(0, width.length - 2)
+            offset -= deleteNotDigits(width)
         }
         slidersField.style.transform = `translateX(-${offset}px)`
 
@@ -478,31 +480,19 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             sliderIndex--
         }
-        if (sliders.length < 10) {
-            countCurrent.textContent = `0${sliderIndex}`
-        } else {
-            countCurrent.textContent = sliderIndex
-        }
-        dots.forEach(dot => dot.style.opacity = '0.5')
-        dots[sliderIndex - 1].style.opacity = 1
+        count()
+        dotsShow()
     })
 
     dots.forEach(dot => {
         dot.addEventListener(('click'), (e) => {
             const slideTo = e.target.getAttribute('data-slide-to')
-
             sliderIndex = slideTo
-            offset = +width.slice(0, width.length - 2) * (slideTo - 1)
+            offset = deleteNotDigits(width) * (slideTo - 1)
             slidersField.style.transform = `translateX(-${offset}px)`
 
-            if (sliders.length < 10) {
-                countCurrent.textContent = `0${sliderIndex}`
-            } else {
-                countCurrent.textContent = sliderIndex
-            }
-
-            dots.forEach(dot => dot.style.opacity = '0.5')
-            dots[sliderIndex - 1].style.opacity = 1
+            count()
+            dotsShow()
         })
     })
 
